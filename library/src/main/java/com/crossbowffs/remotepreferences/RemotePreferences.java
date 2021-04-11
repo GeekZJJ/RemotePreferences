@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +34,7 @@ public class RemotePreferences implements SharedPreferences {
     private final Handler mHandler;
     private final Uri mBaseUri;
     private final boolean mStrictMode;
-    private final WeakHashMap<OnSharedPreferenceChangeListener, PreferenceContentObserver> mListeners;
+    private final HashMap<OnSharedPreferenceChangeListener, PreferenceContentObserver> mListeners;
     private final RemotePreferenceUriParser mUriParser;
 
     /**
@@ -88,7 +87,7 @@ public class RemotePreferences implements SharedPreferences {
         mHandler = handler;
         mBaseUri = Uri.parse("content://" + authority).buildUpon().appendPath(prefFileName).build();
         mStrictMode = strictMode;
-        mListeners = new WeakHashMap<OnSharedPreferenceChangeListener, PreferenceContentObserver>();
+        mListeners = new HashMap<OnSharedPreferenceChangeListener, PreferenceContentObserver>();
         mUriParser = new RemotePreferenceUriParser(authority);
     }
 
@@ -495,11 +494,11 @@ public class RemotePreferences implements SharedPreferences {
      * the corresponding {@link SharedPreferences.OnSharedPreferenceChangeListener}.
      */
     private class PreferenceContentObserver extends ContentObserver {
-        private final WeakReference<OnSharedPreferenceChangeListener> mListener;
+        private final OnSharedPreferenceChangeListener mListener;
 
         private PreferenceContentObserver(OnSharedPreferenceChangeListener listener) {
             super(mHandler);
-            mListener = new WeakReference<OnSharedPreferenceChangeListener>(listener);
+            mListener = listener;
         }
 
         @Override
@@ -515,7 +514,7 @@ public class RemotePreferences implements SharedPreferences {
             // The code which registered the listener is responsible for holding a
             // reference to it. If at any point we find that the listener has been
             // garbage collected, we unregister the observer.
-            OnSharedPreferenceChangeListener listener = mListener.get();
+            OnSharedPreferenceChangeListener listener = mListener;
             if (listener == null) {
                 mContext.getContentResolver().unregisterContentObserver(this);
             } else {

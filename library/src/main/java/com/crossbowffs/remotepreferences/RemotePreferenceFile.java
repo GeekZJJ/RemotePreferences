@@ -61,7 +61,7 @@ public class RemotePreferenceFile {
     public static RemotePreferenceFile[] fromFileNames(String[] prefFileNames) {
         RemotePreferenceFile[] prefFiles = new RemotePreferenceFile[prefFileNames.length];
         for (int i = 0; i < prefFileNames.length; i++) {
-            prefFiles[i] = new RemotePreferenceFile(prefFileNames[i]);
+            prefFiles[i] = new RemotePreferenceFile(prefFileNames[i],true);
         }
         return prefFiles;
     }
